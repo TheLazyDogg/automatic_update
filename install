@@ -1,0 +1,41 @@
+#!/bin/bash
+user_name=$USER
+path_srv=/etc/systemd/system/update.service
+chmod 755 .update/update
+cp -r .update /home/"$user_name/"
+os=$(cat /etc/os-release | grep "^NAME=*" | sed  's/NAME="//g' | sed 's/ [^>]*//g')
+if [[ $# == 1 && $1 == "--server" ]]; then
+	echo "[Unit]" > $path_srv
+	echo "Description = A automatic update daemon" >> $path_srv
+		if [[ $os == "Debian" ]]; then
+			echo "After=networking.service" >> $path_srv
+			else
+			echo "After=NetworkManager.service" >> $path_srv
+		fi
+	echo -n >> $path_srv
+	echo "[Service]" >> $path_srv
+	echo "ExecStart=/bin/bash /home/$user_name/.update/update" >> $path_srv
+	echo "User=root" >> $path_srv
+	echo "Restart=always" >> $path_srv
+	echo "RestartSec=28800" >> $path_srv
+	echo -n >> $path_srv
+	echo "[Install]" >> $path_srv
+	echo "WantedBy=multi-user.target" >> $path_srv
+fi
+if [[ $# == 0 ]]; then
+	echo "[Unit]" > $path_srv
+	echo "Description = A automatic update daemon" >> $path_srv
+		if [[ $os == "Debian" ]]; then
+			echo "After=networking.service" >> $path_srv
+			else
+			echo "After=NetworkManager.service" >> $path_srv
+		fi
+	echo -n >> $path_srv
+	echo "[Service]" >> $path_srv
+	echo "ExecStart=/bin/bash /home/$user_name/.update/update" >> $path_srv
+	echo "User=root" >> $path_srv
+	echo -n >> $path_srv
+	echo "[Install]" >> $path_srv
+	echo "WantedBy=multi-user.target" >> $path_srv
+fi
+systemctl daemon-reload && systemctl enable --now update.service

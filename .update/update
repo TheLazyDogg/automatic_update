@@ -1,0 +1,8 @@
+#!/bin/bash
+file=/tmp/update_status.log
+
+echo "Start of Update LOG - $(date +"%x - %X")" 1> $file
+echo "##########################################" 1>> $file
+apt update && apt upgrade -y &>> $file
+echo "End of Update LOG - $(date +"%x - %X")" 1>> $file
+echo "##########################################" 1>> $file
