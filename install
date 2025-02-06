@@ -1,8 +1,21 @@
 #!/bin/bash
+
+# --------------------------------------
+# | Created By Bruno Santos (LazyDogg) |
+# |  26/01/2025 - 03:13 (GMT -03:00)   |
+# --------------------------------------
+
+if [[ $(whoami) != root ]]; then
+	echo -e "\033[31;1;4mError! you'll need to be root to make this operation\033[0m"
+	echo -e "\033[31;1;4m(Do you type sudo?)\033[0m"
+	exit 1
+fi
+
+
 user_name=$USER
 path_srv=/etc/systemd/system/update.service
-chmod 755 .update/update
-cp -r .update /home/"$user_name/"
+chmod 755 ./update
+cp -r ./update /usr/local/bin
 os=$(cat /etc/os-release | grep "^NAME=*" | sed  's/NAME="//g' | sed 's/ [^>]*//g')
 if [[ $# == 1 && $1 == "--server" ]]; then
 	echo "[Unit]" > $path_srv
@@ -14,10 +27,10 @@ if [[ $# == 1 && $1 == "--server" ]]; then
 		fi
 	echo -n >> $path_srv
 	echo "[Service]" >> $path_srv
-	echo "ExecStart=/bin/bash /home/$user_name/.update/update" >> $path_srv
+	echo "ExecStart=/bin/bash /usr/local/bin/update" >> $path_srv
 	echo "User=root" >> $path_srv
 	echo "Restart=always" >> $path_srv
-	echo "RestartSec=28800" >> $path_srv
+	echo "RestartSec=14400" >> $path_srv # Restart Every 4 hours
 	echo -n >> $path_srv
 	echo "[Install]" >> $path_srv
 	echo "WantedBy=multi-user.target" >> $path_srv
@@ -32,7 +45,7 @@ if [[ $# == 0 ]]; then
 		fi
 	echo -n >> $path_srv
 	echo "[Service]" >> $path_srv
-	echo "ExecStart=/bin/bash /home/$user_name/.update/update" >> $path_srv
+	echo "ExecStart=/bin/bash /usr/local/bin/update" >> $path_srv
 	echo "User=root" >> $path_srv
 	echo -n >> $path_srv
 	echo "[Install]" >> $path_srv
